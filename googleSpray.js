@@ -218,7 +218,7 @@ async function executeWorkflow(page, target, opts, mode) {
     }
 
     // Email Entry Stage
-    const emailField = 'input[type="email"]';
+    const emailField = 'input[type="email"], input[name="identifier"]';
     try {
         await page.waitForSelector(emailField, { visible: true, timeout: 10000 });
     } catch (e) {
@@ -253,7 +253,7 @@ async function executeWorkflow(page, target, opts, mode) {
             }, { timeout: STAGE_TIMEOUT }),
             // New check: The email input is no longer visible/present
             page.waitForFunction(() => {
-                const emailInput = document.querySelector('input[type="email"]');
+                const emailInput = document.querySelector('input[type="email"]') || document.querySelector('input[name="identifier"]');
                 if (!emailInput) return true; // Removed from DOM
                 const style = window.getComputedStyle(emailInput);
                 return style.display === 'none' || style.visibility === 'hidden';
@@ -282,7 +282,7 @@ async function executeWorkflow(page, target, opts, mode) {
 
     // C) Check if Email Field is Gone (Heuristic for Valid User + Intermediate Screen)
     const emailFieldGone = await page.evaluate(() => {
-        const el = document.querySelector('input[type="email"]');
+        const el = document.querySelector('input[type="email"]') || document.querySelector('input[name="identifier"]');
         if (!el) return true;
         const style = window.getComputedStyle(el);
         return style.display === 'none' || style.visibility === 'hidden';
